@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Using NotebookLM in Your Classroom</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+.nlm-lesson {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #1a1a1a;
+  background: transparent;
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.nlm-header {
+  border: 1.5px solid #2563eb;
+  border-radius: 12px;
+  padding: 1.75rem 2rem;
+  margin-bottom: 1.5rem;
+  background: #f0f6ff;
+}
+
+.nlm-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #2563eb;
+  margin-bottom: 0.5rem;
+}
+
+.nlm-header h1 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 0.5rem;
+  line-height: 1.25;
+}
+
+.nlm-header p {
+  font-size: 14px;
+  color: #555;
+  max-width: 540px;
+}
+
+.nlm-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.nlm-track {
+  flex: 1;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.nlm-fill {
+  height: 100%;
+  background: #2563eb;
+  border-radius: 3px;
+  width: 0%;
+  transition: width 0.5s ease;
+}
+
+.nlm-progress-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: #888;
+  min-width: 48px;
+  text-align: right;
+}
+
+.nlm-section {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  overflow: hidden;
+  background: #fff;
+  transition: border-color 0.25s;
+}
+
+.nlm-section.done { border-color: #bbf7d0; background: #f0fdf4; }
+
+.nlm-sec-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 1rem 1.25rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+}
+
+.nlm-sec-btn:hover { background: #f9fafb; }
+.nlm-section.done .nlm-sec-btn:hover { background: #ecfdf5; }
+
+.nlm-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  color: #2563eb;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  padding: 3px 8px;
+  flex-shrink: 0;
+}
+
+.nlm-section.done .nlm-num {
+  color: #16a34a;
+  background: #dcfce7;
+  border-color: #bbf7d0;
+}
+
+.nlm-sec-meta { flex: 1; }
+
+.nlm-sec-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111;
+  line-height: 1.3;
+}
+
+.nlm-sec-sub {
+  font-size: 12px;
+  color: #888;
+  margin-top: 1px;
+}
+
+.nlm-section.done .nlm-sec-sub { display: none; }
+
+.nlm-done-badge {
+  display: none;
+  font-size: 12px;
+  color: #16a34a;
+  font-weight: 500;
+  margin-top: 1px;
+}
+
+.nlm-section.done .nlm-done-badge { display: block; }
+
+.nlm-chevron {
+  font-size: 16px;
+  color: #2563eb;
+  transition: transform 0.25s;
+  flex-shrink: 0;
+}
+
+.nlm-chevron.open { transform: rotate(180deg); }
+
+.nlm-body {
+  display: none;
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.nlm-body.open { display: block; }
+
+.nlm-prose {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #374151;
+  margin-bottom: 1rem;
+}
+
+.nlm-callout {
+  background: #eff6ff;
+  border-left: 3px solid #2563eb;
+  border-radius: 0 8px 8px 0;
+  padding: 0.875rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 13px;
+  color: #1d4ed8;
+  line-height: 1.6;
+}
+
+.nlm-callout.warn {
+  background: #fffbeb;
+  border-color: #f59e0b;
+  color: #92400e;
+}
+
+.nlm-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 1rem;
+}
+
+.nlm-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1d4ed8;
+}
+
+.nlm-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+.nlm-step {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.875rem;
+}
+
+.nlm-step-n {
+  font-family: 'DM Mono', monospace;
+  font-size: 18px;
+  font-weight: 500;
+  color: #2563eb;
+  margin-bottom: 4px;
+}
+
+.nlm-step-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 3px;
+}
+
+.nlm-step-body { font-size: 12px; color: #6b7280; line-height: 1.5; }
+
+.nlm-checklist {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 1rem;
+}
+
+.nlm-checklist label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  color: #374151;
+  cursor: pointer;
+  line-height: 1.5;
+}
+
+.nlm-checklist input[type=checkbox] {
+  width: 16px;
+  height: 16px;
+  accent-color: #2563eb;
+  flex-shrink: 0;
+  margin-top: 2px;
+  cursor: pointer;
+}
+
+.nlm-checklist label.checked {
+  color: #9ca3af;
+  text-decoration: line-through;
+}
+
+.nlm-use-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 8px;
+  margin-bottom: 1rem;
+}
+
+.nlm-use-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.875rem;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.nlm-use-card:hover { border-color: #93c5fd; }
+.nlm-use-card.sel { border-color: #2563eb; background: #eff6ff; }
+
+.nlm-use-icon { font-size: 18px; margin-bottom: 6px; }
+.nlm-use-title { font-size: 12px; font-weight: 600; color: #111; margin-bottom: 3px; }
+.nlm-use-desc { font-size: 11px; color: #6b7280; line-height: 1.4; }
+
+.nlm-prompt-ex {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 7px;
+  padding: 9px 12px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: #1d4ed8;
+  margin-bottom: 7px;
+}
+
+.nlm-reflect {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.nlm-reflect-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #2563eb;
+  margin-bottom: 6px;
+}
+
+.nlm-reflect-q {
+  font-size: 13px;
+  color: #374151;
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+.nlm-reflect textarea {
+  width: 100%;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: #111;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 8px 10px;
+  resize: vertical;
+  min-height: 64px;
+  line-height: 1.6;
+  transition: border-color 0.2s;
+}
+
+.nlm-reflect textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+.nlm-reflect textarea::placeholder { color: #c0c0c0; }
+
+.nlm-divider { height: 1px; background: #f3f4f6; margin: 1rem 0; }
+
+.nlm-mark-btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 18px;
+  border-radius: 7px;
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  color: #1d4ed8;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+  margin-top: 0.25rem;
+}
+
+.nlm-mark-btn:hover {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+}
+
+.nlm-complete {
+  display: none;
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  margin-top: 1.5rem;
+}
+
+.nlm-complete.show { display: block; }
+
+.nlm-complete-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 0.5rem;
+}
+
+.nlm-complete-title span { color: #16a34a; }
+
+.nlm-complete-body {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 1.5rem;
+  line-height: 1.7;
+}
+
+.nlm-complete-cta {
+  display: inline-block;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 22px;
+  border-radius: 8px;
+  background: #16a34a;
+  color: #fff;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.nlm-complete-cta:hover { background: #15803d; }
+</style>
+</head>
+<body>
+
+<div class="nlm-lesson">
+
+  <div class="nlm-header">
+    <div class="nlm-eyebrow">AI Tools for Educators</div>
+    <h1>Using NotebookLM in Your Classroom</h1>
+    <p>A hands-on lesson for teachers. Work through each section, check off tasks, and reflect on how you'll use this tool with your students.</p>
+  </div>
+
+  <div class="nlm-progress-row">
+    <div class="nlm-track"><div class="nlm-fill" id="prog-fill"></div></div>
+    <div class="nlm-progress-label" id="prog-label">0 / 5</div>
+  </div>
+
+  <!-- SECTION 1 -->
+  <div class="nlm-section" id="s1">
+    <button class="nlm-sec-btn" onclick="tog(1)">
+      <span class="nlm-num">01</span>
+      <div class="nlm-sec-meta">
+        <div class="nlm-sec-title">What is NotebookLM?</div>
+        <div class="nlm-sec-sub">Overview and core concepts</div>
+        <div class="nlm-done-badge">&#10003; Complete</div>
+      </div>
+      <span class="nlm-chevron" id="cv1">&#8964;</span>
+    </button>
+    <div class="nlm-body" id="b1">
+      <p class="nlm-prose">NotebookLM is a Google AI tool that lets you upload your own documents, then chat with an AI that is grounded exclusively in those materials. Unlike ChatGPT or Gemini, it doesn't draw on general internet knowledge — it only knows what you give it.</p>
+      <div class="nlm-callout">Key idea: NotebookLM is a source-grounded AI. Answers are tied directly to your documents, which means fewer hallucinations and more reliable results for classroom use.</div>
+      <p style="font-size:12px;color:#888;margin-bottom:8px;">Things you can upload:</p>
+      <div class="nlm-tags">
+        <span class="nlm-tag">Google Docs</span>
+        <span class="nlm-tag">PDFs</span>
+        <span class="nlm-tag">Slides</span>
+        <span class="nlm-tag">YouTube links</span>
+        <span class="nlm-tag">Web URLs</span>
+        <span class="nlm-tag">Audio files</span>
+        <span class="nlm-tag">Text files</span>
+      </div>
+      <p style="font-size:12px;color:#888;margin-bottom:8px;">Check off what you understood:</p>
+      <ul class="nlm-checklist">
+        <li><label><input type="checkbox" onchange="chk(this)"> NotebookLM only uses sources I provide, not the open internet</label></li>
+        <li><label><input type="checkbox" onchange="chk(this)"> I can upload multiple file types including PDFs and YouTube links</label></li>
+        <li><label><input type="checkbox" onchange="chk(this)"> It's different from ChatGPT because it stays grounded in my materials</label></li>
+      </ul>
+      <div class="nlm-reflect">
+        <div class="nlm-reflect-label">Reflection prompt</div>
+        <div class="nlm-reflect-q">Think about a unit you're teaching right now. What documents or materials would you want to upload into NotebookLM?</div>
+        <textarea placeholder="Type your thoughts here..."></textarea>
+      </div>
+      <button class="nlm-mark-btn" onclick="done(1)">Mark section complete &#10003;</button>
+    </div>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="nlm-section" id="s2">
+    <button class="nlm-sec-btn" onclick="tog(2)">
+      <span class="nlm-num">02</span>
+      <div class="nlm-sec-meta">
+        <div class="nlm-sec-title">Setting Up Your First Notebook</div>
+        <div class="nlm-sec-sub">Step-by-step walkthrough</div>
+        <div class="nlm-done-badge">&#10003; Complete</div>
+      </div>
+      <span class="nlm-chevron" id="cv2">&#8964;</span>
+    </button>
+    <div class="nlm-body" id="b2">
+      <p class="nlm-prose">Getting started is fast. Here's the process from your first login to your first conversation:</p>
+      <div class="nlm-steps">
+        <div class="nlm-step">
+          <div class="nlm-step-n">01</div>
+          <div class="nlm-step-title">Go to notebooklm.google.com</div>
+          <div class="nlm-step-body">Sign in with your Google account. Free accounts get up to 50 notebooks with 50 sources each.</div>
+        </div>
+        <div class="nlm-step">
+          <div class="nlm-step-n">02</div>
+          <div class="nlm-step-title">Create a new notebook</div>
+          <div class="nlm-step-body">Click "New Notebook." Name it after your unit or topic.</div>
+        </div>
+        <div class="nlm-step">
+          <div class="nlm-step-n">03</div>
+          <div class="nlm-step-title">Add your sources</div>
+          <div class="nlm-step-body">Upload PDFs, paste a URL, or link a YouTube video. Multiple sources at once is fine.</div>
+        </div>
+        <div class="nlm-step">
+          <div class="nlm-step-n">04</div>
+          <div class="nlm-step-title">Start chatting</div>
+          <div class="nlm-step-body">Use the chat panel on the right to ask questions, get summaries, or build study tools.</div>
+        </div>
+      </div>
+      <div class="nlm-callout">Pro tip: After uploading, check the Notebook Guide panel. NotebookLM auto-generates a summary, key topics, and suggested questions instantly.</div>
+      <p style="font-size:12px;color:#888;margin-bottom:8px;">Check off each step as you complete or confirm it:</p>
+      <ul class="nlm-checklist">
+        <li><label><input type="checkbox" onchange="chk(this)"> I know where to access NotebookLM (notebooklm.google.com)</label></li>
+        <li><label><input type="checkbox" onchange="chk(this)"> I can create a new notebook and name it</label></li>
+        <li><label><input type="checkbox" onchange="chk(this)"> I know how to upload at least two different source types</label></li>
+        <li><label><input type="checkbox" onchange="chk(this)"> I know where the chat panel is and what it does</label></li>
+      </ul>
+      <button class="nlm-mark-btn" onclick="done(2)">Mark section complete &#10003;</button>
+    </div>
+  </div>
+
+  <!-- SECTION 3 -->
+  <div class="nlm-section" id="s3">
+    <button class="nlm-sec-btn" onclick="tog(3)">
+      <span class="nlm-num">03</span>
+      <div class="nlm-sec-meta">
+        <div class="nlm-sec-title">Classroom Use Cases</div>
+        <div class="nlm-sec-sub">How teachers are using this right now</div>
+        <div class="nlm-done-badge">&#10003; Complete</div>
+      </div>
+      <span class="nlm-chevron" id="cv3">&#8964;</span>
+    </button>
+    <div class="nlm-body" id="b3">
+      <p class="nlm-prose">NotebookLM is flexible across grade levels and subjects. Click the use cases below that feel most relevant to your context:</p>
+      <div class="nlm-use-grid">
+        <div class="nlm-use-card" onclick="this.classList.toggle('sel')">
+          <div class="nlm-use-icon">&#128218;</div>
+          <div class="nlm-use-title">Study guide generator</div>
+          <div class="nlm-use-desc">Upload a chapter or unit, then ask for a review sheet or study guide for students.</div>
+        </div>
+        <div class="nlm-use-card" onclick="this.classList.toggle('sel')">
+          <div class="nlm-use-icon">&#127911;</div>
+          <div class="nlm-use-title">Audio podcast from sources</div>
+          <div class="nlm-use-desc">Generate an AI-hosted audio overview — great for auditory learners or listening stations.</div>
+        </div>
+        <div class="nlm-use-card" onclick="this.classList.toggle('sel')">
+          <div class="nlm-use-icon">&#10067;</div>
+          <div class="nlm-use-title">Student Q&amp;A tutor</div>
+          <div class="nlm-use-desc">Share a notebook with students so they can ask questions grounded in class materials.</div>
+        </div>
+        <div class="nlm-use-card" onclick="this.classList.toggle('sel')">
+          <div class="nlm-use-icon">&#128196;</div>
+          <div class="nlm-use-title">Lesson planning assistant</div>
+          <div class="nlm-use-desc">Upload standards documents and curriculum guides, then ask for lesson ideas or pacing help.</div>
+        </div>
+        <div class="nlm-use-card" onclick="this.classList.toggle('sel')">
+          <div class="nlm-use-icon">&#9997;</div>
+          <div class="nlm-use-title">Differentiation support</div>
+          <div class="nlm-use-desc">Ask it to rewrite a passage at a lower reading level or create a scaffolded version.</div>
+        </div>
+        <div class="nlm-use-card" onclick="this.classList.toggle('sel')">
+          <div class="nlm-use-icon">&#128202;</div>
+          <div class="nlm-use-title">Research synthesis</div>
+          <div class="nlm-use-desc">Upload multiple articles and ask for a synthesized summary or cross-source comparison.</div>
+        </div>
+      </div>
+      <div class="nlm-reflect">
+        <div class="nlm-reflect-label">Reflection prompt</div>
+        <div class="nlm-reflect-q">Which 1-2 use cases feel most immediately useful for where you are right now? What would you need to try one this week?</div>
+        <textarea placeholder="Type your thoughts here..."></textarea>
+      </div>
+      <button class="nlm-mark-btn" onclick="done(3)">Mark section complete &#10003;</button>
+    </div>
+  </div>
+
+  <!-- SECTION 4 -->
+  <div class="nlm-section" id="s4">
+    <button class="nlm-sec-btn" onclick="tog(4)">
+      <span class="nlm-num">04</span>
+      <div class="nlm-sec-meta">
+        <div class="nlm-sec-title">Prompting Inside NotebookLM</div>
+        <div class="nlm-sec-sub">Getting better outputs from your sources</div>
+        <div class="nlm-done-badge">&#10003; Complete</div>
+      </div>
+      <span class="nlm-chevron" id="cv4">&#8964;</span>
+    </button>
+    <div class="nlm-body" id="b4">
+      <p class="nlm-prose">NotebookLM won't make things up — but being specific with your prompts still matters a lot. The more context you give, the more useful the response.</p>
+      <div class="nlm-callout">NotebookLM always cites the source it used. Click any citation to see the exact passage. This is a powerful verification habit to model for students.</div>
+      <p style="font-size:12px;color:#888;margin-bottom:8px;">Prompts that work well:</p>
+      <div class="nlm-prompt-ex">"Summarize the main argument of this article in 3 sentences."</div>
+      <div class="nlm-prompt-ex">"Create 5 discussion questions based on chapter 3."</div>
+      <div class="nlm-prompt-ex">"What evidence in these sources supports the claim that ___?"</div>
+      <div class="nlm-prompt-ex">"Rewrite this passage for a 6th grade reading level."</div>
+      <div class="nlm-prompt-ex">"Give me a vocabulary list with definitions from this document."</div>
+      <div class="nlm-divider"></div>
+      <p style="font-size:12px;color:#888;margin-bottom:8px;">Check off what you're comfortable with:</p>
+      <ul class="nlm-checklist">
+        <li><label><input type="checkbox" onchange="chk(this)"> I understand how to write a clear, specific prompt</label></li>
+        <li><label><input type="checkbox" onchange="chk(this)"> I know how to find and use the source citations in responses</label></li>
+        <li><label><input type="checkbox" onchange="chk(this)"> I can write at least one prompt I'd actually use with my content</label></li>
+      </ul>
+      <div class="nlm-reflect">
+        <div class="nlm-reflect-label">Try it now</div>
+        <div class="nlm-reflect-q">Write a prompt you'd actually use this week. Be specific — include the task, the audience, and any constraints.</div>
+        <textarea placeholder="Example: Create 3 exit ticket questions for 7th graders based on the civil rights reading I uploaded..."></textarea>
+      </div>
+      <button class="nlm-mark-btn" onclick="done(4)">Mark section complete &#10003;</button>
+    </div>
+  </div>
+
+  <!-- SECTION 5 -->
+  <div class="nlm-section" id="s5">
+    <button class="nlm-sec-btn" onclick="tog(5)">
+      <span class="nlm-num">05</span>
+      <div class="nlm-sec-meta">
+        <div class="nlm-sec-title">Privacy, Limitations &amp; Next Steps</div>
+        <div class="nlm-sec-sub">What to know before you go</div>
+        <div class="nlm-done-badge">&#10003; Complete</div>
+      </div>
+      <span class="nlm-chevron" id="cv5">&#8964;</span>
+    </button>
+    <div class="nlm-body" id="b5">
+      <p class="nlm-prose">Before bringing any AI tool into your classroom, understand its limitations and your responsibilities around student data.</p>
+      <div class="nlm-steps">
+        <div class="nlm-step" style="border-color:#fecaca;">
+          <div class="nlm-step-n" style="color:#dc2626;">!</div>
+          <div class="nlm-step-title">No student PII</div>
+          <div class="nlm-step-body">Do not upload documents with student names, IDs, or identifiable data. Use curriculum materials only.</div>
+        </div>
+        <div class="nlm-step" style="border-color:#fecaca;">
+          <div class="nlm-step-n" style="color:#dc2626;">!</div>
+          <div class="nlm-step-title">50 source limit</div>
+          <div class="nlm-step-body">Each notebook holds up to 50 sources. Organize by unit, not by full course.</div>
+        </div>
+        <div class="nlm-step" style="border-color:#fed7aa;">
+          <div class="nlm-step-n" style="color:#d97706;">~</div>
+          <div class="nlm-step-title">Audio is experimental</div>
+          <div class="nlm-step-body">The Audio Overview feature is impressive but can be imprecise. Preview before sharing with students.</div>
+        </div>
+        <div class="nlm-step" style="border-color:#bbf7d0;">
+          <div class="nlm-step-n" style="color:#16a34a;">&#10003;</div>
+          <div class="nlm-step-title">Free to use</div>
+          <div class="nlm-step-body">NotebookLM is free with a Google account. No subscription needed to get started.</div>
+        </div>
+      </div>
+      <div class="nlm-divider"></div>
+      <p style="font-size:13px;font-weight:600;color:#111;margin-bottom:8px;">Your next steps:</p>
+      <ul class="nlm-checklist">
+        <li><label><input type="checkbox" onchange="chk(this)"> I've identified a unit or topic where I'll try NotebookLM this week</label></li>
+        <li><label><input type="checkbox" onchange="chk(this)"> I know what sources I'll upload first</label></li>
+        <li><label><input type="checkbox" onchange="chk(this)"> I've reviewed my district's AI and data privacy guidance</label></li>
+        <li><label><input type="checkbox" onchange="chk(this)"> I'm ready to try at least one use case from Section 3</label></li>
+      </ul>
+      <div class="nlm-reflect">
+        <div class="nlm-reflect-label">Final reflection</div>
+        <div class="nlm-reflect-q">What's one thing that surprised you during this lesson? What's one concrete thing you'll do differently because of it?</div>
+        <textarea placeholder="Type your final reflection here..."></textarea>
+      </div>
+      <button class="nlm-mark-btn" onclick="done(5)">Mark section complete &#10003;</button>
+    </div>
+  </div>
+
+  <div class="nlm-complete" id="comp">
+    <div style="font-size:36px;margin-bottom:1rem;">&#127881;</div>
+    <div class="nlm-complete-title">Lesson <span>Complete!</span></div>
+    <p class="nlm-complete-body">You've worked through all five sections. You're ready to bring NotebookLM into your classroom. Start small, try one use case, and build from there.</p>
+    <a class="nlm-complete-cta" href="https://notebooklm.google.com" target="_blank">Open NotebookLM &#8599;</a>
+  </div>
+
+</div>
+
+<script>
+var total = 5, done_set = new Set();
+
+function tog(n) {
+  var body = document.getElementById('b'+n);
+  var chev = document.getElementById('cv'+n);
+  var open = body.classList.contains('open');
+  document.querySelectorAll('.nlm-body').forEach(function(b){ b.classList.remove('open'); });
+  document.querySelectorAll('.nlm-chevron').forEach(function(c){ c.classList.remove('open'); });
+  if (!open) { body.classList.add('open'); chev.classList.add('open'); }
+}
+
+function chk(cb) {
+  cb.closest('label').classList.toggle('checked', cb.checked);
+}
+
+function done(n) {
+  done_set.add(n);
+  document.getElementById('s'+n).classList.add('done');
+  document.getElementById('b'+n).classList.remove('open');
+  document.getElementById('cv'+n).classList.remove('open');
+  var pct = (done_set.size / total * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-label').textContent = done_set.size + ' / ' + total;
+  if (n < total) { setTimeout(function(){ tog(n+1); }, 300); }
+  if (done_set.size === total) {
+    setTimeout(function(){
+      document.getElementById('comp').classList.add('show');
+    }, 400);
+  }
+}
+
+tog(1);
+</script>
+
+</body>
+</html>
