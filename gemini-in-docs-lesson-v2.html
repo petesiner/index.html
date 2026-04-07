@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gemini in Google Docs – Teach Smarter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue: #378ADD;
+    --blue-light: #E6F1FB;
+    --blue-mid: #185FA5;
+    --blue-dark: #0C447C;
+    --green: #639922;
+    --green-light: #EAF3DE;
+    --green-mid: #3B6D11;
+    --purple: #7F77DD;
+    --purple-light: #EEEDFE;
+    --purple-mid: #534AB7;
+    --amber-light: #FAEEDA;
+    --amber-mid: #854F0B;
+    --gray-bg: #F7F6F4;
+    --gray-card: #FFFFFF;
+    --gray-surface: #F1EFE8;
+    --gray-border: rgba(0,0,0,0.09);
+    --gray-border-mid: rgba(0,0,0,0.16);
+    --text-primary: #1a1a1a;
+    --text-secondary: #4a4a4a;
+    --text-muted: #888;
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+  }
+
+  html { font-size: 16px; }
+
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: var(--gray-bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    padding: 2.5rem 1.5rem 5rem;
+  }
+
+  .container { max-width: 700px; margin: 0 auto; }
+
+  /* ── Hero ── */
+  .hero { margin-bottom: 1.75rem; }
+  .hero-tag {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--purple-mid);
+    margin-bottom: .6rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hero-tag::before {
+    content: '';
+    display: inline-block;
+    width: 16px; height: 1.5px;
+    background: var(--purple-mid);
+  }
+  .hero h1 {
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--text-primary);
+    margin-bottom: .5rem;
+  }
+  .hero h1 em { color: var(--purple-mid); font-style: normal; }
+  .hero-sub {
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    max-width: 540px;
+  }
+
+  /* ── GIF demo card ── */
+  .demo-card {
+    background: var(--gray-card);
+    border: 0.5px solid var(--gray-border);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+  .demo-card img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  }
+  .demo-caption {
+    padding: .75rem 1.25rem;
+    font-size: 13px;
+    color: var(--text-muted);
+    border-top: 0.5px solid var(--gray-border);
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+  .demo-caption::before {
+    content: '';
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--purple);
+    flex-shrink: 0;
+  }
+
+  /* ── Can-do pills ── */
+  .cando {
+    background: var(--gray-card);
+    border: 0.5px solid var(--gray-border);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  .cando-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: .75rem;
+  }
+  .pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+  }
+  .pill {
+    font-size: 13px;
+    font-weight: 500;
+    background: var(--purple-light);
+    color: var(--purple-mid);
+    border-radius: 99px;
+    padding: .3rem .85rem;
+  }
+
+  /* ── Progress ── */
+  .prog-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1.25rem;
+  }
+  .prog-track {
+    flex: 1; height: 4px;
+    background: #e0deda;
+    border-radius: 99px; overflow: hidden;
+  }
+  .prog-fill {
+    height: 100%;
+    background: var(--purple);
+    border-radius: 99px;
+    width: 0%;
+    transition: width .35s ease;
+  }
+  .prog-lbl {
+    font-size: 12px;
+    color: var(--text-muted);
+    min-width: 36px;
+    text-align: right;
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ── Steps ── */
+  .steps { display: flex; flex-direction: column; gap: .5rem; margin-bottom: 1.5rem; }
+
+  .step {
+    background: var(--gray-card);
+    border: 0.5px solid var(--gray-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: border-color .2s;
+  }
+  .step.active { border-color: var(--purple); }
+
+  .step-hdr {
+    padding: .9rem 1.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: .85rem;
+    user-select: none;
+    transition: background .15s;
+  }
+  .step-hdr:hover { background: var(--gray-bg); }
+
+  .step-badge {
+    font-size: 11px;
+    font-weight: 500;
+    font-family: 'DM Mono', monospace;
+    color: var(--purple-mid);
+    background: var(--purple-light);
+    border-radius: var(--radius-md);
+    padding: .2rem .55rem;
+    flex-shrink: 0;
+    min-width: 32px;
+    text-align: center;
+    transition: all .2s;
+  }
+  .step-badge.done { background: var(--green-light); color: var(--green-mid); }
+
+  .step-icon { font-size: 16px; flex-shrink: 0; }
+
+  .step-title {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-muted);
+    line-height: 1.3;
+  }
+  .step.active .step-title { color: var(--text-primary); }
+
+  .step-chev {
+    font-size: 11px;
+    color: var(--text-muted);
+    transition: transform .22s;
+    flex-shrink: 0;
+  }
+  .step.active .step-chev { transform: rotate(180deg); color: var(--purple); }
+
+  .step-body {
+    display: none;
+    padding: 0 1.25rem 1.25rem;
+    border-top: 0.5px solid var(--gray-border);
+  }
+  .step.active .step-body { display: block; }
+
+  .step-scene {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-style: italic;
+    margin: .75rem 0 1rem;
+    padding-left: .75rem;
+    border-left: 2px solid #e0deda;
+    line-height: 1.5;
+    border-radius: 0;
+  }
+
+  /* ── Tasks ── */
+  .tasks { list-style: none; display: flex; flex-direction: column; gap: .3rem; }
+
+  .task {
+    display: flex;
+    align-items: flex-start;
+    gap: .75rem;
+    cursor: pointer;
+    padding: .4rem .5rem;
+    border-radius: var(--radius-md);
+    transition: background .15s;
+  }
+  .task:hover { background: var(--gray-bg); }
+
+  .cb {
+    width: 18px; height: 18px;
+    border: 0.5px solid var(--gray-border-mid);
+    border-radius: 4px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+    transition: all .2s;
+    background: var(--gray-card);
+  }
+  .task.checked .cb { background: var(--purple); border-color: var(--purple); }
+
+  .chk {
+    display: none;
+    width: 10px; height: 10px;
+    stroke: #fff; fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .task.checked .chk { display: block; }
+
+  .task-txt {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    flex: 1;
+  }
+  .task.checked .task-txt {
+    color: var(--text-muted);
+    text-decoration: line-through;
+    text-decoration-color: #ccc;
+  }
+  .task-txt code {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    background: var(--gray-bg);
+    border: 0.5px solid var(--gray-border-mid);
+    border-radius: 4px;
+    padding: .1rem .35rem;
+    color: var(--purple-mid);
+  }
+  .task.checked .task-txt code { opacity: .5; }
+
+  /* ── Tip ── */
+  .tip {
+    margin-top: .9rem;
+    background: var(--purple-light);
+    border-radius: var(--radius-md);
+    padding: .65rem .9rem;
+    font-size: 13px;
+    color: var(--purple-mid);
+    display: flex;
+    align-items: flex-start;
+    gap: .5rem;
+    line-height: 1.5;
+  }
+
+  /* ── Example prompts ── */
+  .prompts {
+    margin-top: .9rem;
+    display: flex;
+    flex-direction: column;
+    gap: .4rem;
+  }
+  .prompts-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: .2rem;
+  }
+  .prompt-chip {
+    background: var(--gray-bg);
+    border: 0.5px solid var(--gray-border-mid);
+    border-radius: var(--radius-md);
+    padding: .5rem .85rem;
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-style: italic;
+    line-height: 1.4;
+  }
+  .prompt-chip::before { content: '"'; color: var(--purple); margin-right: 2px; }
+  .prompt-chip::after { content: '"'; color: var(--purple); margin-left: 2px; }
+
+  /* ── Done banner ── */
+  .done-banner {
+    display: none;
+    margin-top: .75rem;
+    background: var(--green-light);
+    border-radius: var(--radius-md);
+    padding: .6rem .9rem;
+    font-size: 13px;
+    color: var(--green-mid);
+    align-items: center;
+    gap: .5rem;
+  }
+  .done-banner.visible { display: flex; }
+
+  /* ── Quick ref table ── */
+  .ref-card {
+    background: var(--gray-card);
+    border: 0.5px solid var(--gray-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+  .ref-card-hdr {
+    padding: .9rem 1.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+    border-bottom: 0.5px solid var(--gray-border);
+  }
+  .ref-card-hdr:hover { background: var(--gray-bg); }
+  .ref-card-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+  .ref-card-chev {
+    font-size: 11px;
+    color: var(--text-muted);
+    transition: transform .22s;
+  }
+  .ref-card.open .ref-card-chev { transform: rotate(180deg); }
+  .ref-body { display: none; }
+  .ref-card.open .ref-body { display: block; }
+  .ref-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .ref-table th {
+    text-align: left;
+    padding: .6rem 1.25rem;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: var(--gray-bg);
+    border-bottom: 0.5px solid var(--gray-border);
+  }
+  .ref-table td {
+    padding: .6rem 1.25rem;
+    border-bottom: 0.5px solid var(--gray-border);
+    color: var(--text-secondary);
+    line-height: 1.4;
+    vertical-align: top;
+  }
+  .ref-table tr:last-child td { border-bottom: none; }
+  .ref-table td:first-child {
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    width: 38%;
+  }
+
+  /* ── Checklist ── */
+  .cl-card {
+    background: var(--gray-card);
+    border: 0.5px solid var(--gray-border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+  }
+  .cl-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+  }
+  .cl-list { list-style: none; display: flex; flex-direction: column; gap: .5rem; }
+  .cl-item {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    font-size: 14px;
+    color: var(--text-muted);
+    transition: color .3s;
+  }
+  .cl-item.done { color: var(--green-mid); }
+  .cl-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #ddd;
+    flex-shrink: 0;
+    transition: background .3s;
+  }
+  .cl-item.done .cl-dot { background: var(--green); }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: 2.5rem;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .footer a { color: var(--purple-mid); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-tag">Your turn · Gemini in Docs</div>
+    <h1>Collaborate with <em>Gemini</em><br>in Google Docs</h1>
+    <div class="hero-sub">Explore Gemini's side panel to summarize, write, refine, and generate images — right inside a Google Doc.</div>
+  </div>
+
+  <!-- GIF Demo -->
+  <div class="demo-card">
+    <img src="docs_gemini.gif" alt="Animation showing how to ask Gemini in Docs about a proposal for a new electric bike" loading="lazy">
+    <div class="demo-caption">Gemini side panel in action — ask questions, get summaries, generate content</div>
+  </div>
+
+  <!-- What you can do -->
+  <div class="cando">
+    <div class="cando-label">With Gemini in Docs, you can</div>
+    <div class="pills">
+      <span class="pill">Summarize documents</span>
+      <span class="pill">Write &amp; edit content</span>
+      <span class="pill">Refine tone &amp; style</span>
+      <span class="pill">Generate images</span>
+      <span class="pill">Reference Drive files</span>
+      <span class="pill">Search the web</span>
+      <span class="pill">Use Gems</span>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="prog-row">
+    <div class="prog-track"><div class="prog-fill" id="prog"></div></div>
+    <div class="prog-lbl" id="prog-lbl">0 / 5</div>
+  </div>
+
+  <!-- Steps -->
+  <div class="steps">
+
+    <!-- Step 1 -->
+    <div class="step active" data-step="0">
+      <div class="step-hdr" onclick="toggleStep(0)">
+        <div class="step-badge" id="num-0">01</div>
+        <div class="step-icon">✨</div>
+        <div class="step-title">Open Gemini &amp; explore the side panel</div>
+        <div class="step-chev">▾</div>
+      </div>
+      <div class="step-body">
+        <div class="step-scene">Get familiar with where Gemini lives and what the panel offers.</div>
+        <ul class="tasks" id="tasks-0">
+          <li class="task" onclick="checkTask(this,0)"><div class="cb"><svg class="chk" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="task-txt">Open any document in Google Docs</span></li>
+          <li class="task" onclick="checkTask(this,0)"><div class="cb"><svg class="chk" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="task-txt">Click <strong>Ask Gemini</strong> at the top right to open the side panel</span></li>
+          <li class="task" onclick="checkTask(this,0)"><div class="cb"><svg class="chk" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="task-txt">Browse the suggested prompts — click <strong>More suggestions</strong> to see additional options</span></li>
+          <li class="task" onclick="checkTask(this,0)"><div class="cb"><svg class="chk" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="task-txt">Locate the <strong>Expand</strong>, <strong>Collapse</strong>, and <strong>Close</strong> controls at the top of the panel</span></li>
+        </ul>
+        <div class="tip">💡 The panel remembers your conversation — but history clears when you refresh or close the doc. Insert important outputs before leaving.</div>
+        <div class="done-banner" id="done-0">✓ Gemini panel open and explored</div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step" data-step="1">
+      <div class="step-hdr" onclick="toggleStep(1)">
+        <div class="step-badge" id="num-1">02</div>
+        <div class="step-icon">📋</div>
+        <div class="step-title">Summarize a document</div>
+        <div class="step-chev">▾</div>
+      </div>
+      <div class="step-body">
+        <div class="step-scene">Use Gemini to get a quick read on a document without reading every word.</div>
+        <ul class="tasks" id="tasks-1">
+          <li class="task" onclick="checkTask(this,1)"><div class="cb"><svg class="chk" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="task-txt">Open a document that has text content — a lesson plan, reading, or article works well</span></li>
+          <li class="task" onclick="checkTask(this,1)"><div class="cb"><svg class="chk" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="task-txt">In the Gemini panel, try one of the example prompts below</span></li>
+          <li class="task" onclick="checkTask(this,1)"><div class="cb"><svg class="chk" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="task-txt">Highlight a specific paragraph, then ask Gemini to summarize just that section</span></li>
+          <li class="task" onclick="checkTask(this,1)"><div class="cb"><svg class="chk" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="task-txt">Click <strong>Insert</strong> to add the summary to your document, or <strong>Retry</strong> for a different version</span></li>
+        </ul>
+        <div class="prompts">
+          <div class="prompts-label">Try these prompts</div>
+          <div class="prompt-chip">Summarize this document in 3 bullet points.</div>
+          <div class="prompt-chip">Explain this document like I'm 5 years old.</div>
+        </div>
+        <div class="done-banner" id="done-1">✓ Document summarized with Gemini</div>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step" data-step="2">
+      <div class="step-hdr" onclick="toggleStep(2)">
+        <div class="step-badge" id="num-2">03</div>
+        <div class="step-icon">✏️</div>
+        <div class="step-title">Edit &amp; refine content</div>
+        <div class="step-chev">▾</div>
+      </div>
+      <div class="step-body">
+        <div class="step-scene">Use the Refine tool to rewrite, adjust tone, or strengthen a section of your writing.</div>
+        <ul class="tasks" id="tasks-2">
+          <li class="task" onclick="checkTask(this,2)"><div class="cb"><svg class="chk" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="task-txt">Select a paragraph of text in your document</span></li>
+          <li class="task" onclick="checkTask(this,2)"><div class="cb"><svg class="chk" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="task-txt">On the floating bar that appears, click <strong>Refine</strong></span></li>
+          <li class="task" onclick="checkTask(this,2)"><div class="cb"><svg class="chk" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="task-txt">Try at least two options: <strong>Rephrase</strong>, <strong>Enhance</strong>, <strong>Shorten</strong>, <strong>More formal</strong>, or <strong>More casual</strong></span></li>
+          <li class="task" onclick="checkTask(this,2)"><div class="cb"><svg class="chk" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="task-txt">Review the suggested changes, then click <strong>Accept all</strong> or <strong>Reject all</strong></span></li>
+        </ul>
+        <div class="prompts">
+          <div class="prompts-label">Or enter a custom prompt</div>
+          <div class="prompt-chip">Add evidence to my Research section.</div>
+          <div class="prompt-chip">Suggest places where I can better substantiate my argument.</div>
+        </div>
+        <div class="tip">💡 If you paste new content into an existing doc, use <strong>Match writing style</strong> to blend it seamlessly.</div>
+        <div class="done-banner" id="done-2">✓ Content refined with Gemini</div>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step" data-step="3">
+      <div class="step-hdr" onclick="toggleStep(3)">
+        <div class="step-badge" id="num-3">04</div>
+        <div class="step-icon">🖼️</div>
+        <div class="step-title">Generate an image</div>
+        <div class="step-chev">▾</div>
+      </div>
+      <div class="step-body">
+        <div class="step-scene">Create a custom image for your document without leaving Docs.</div>
+        <ul class="tasks" id="tasks-3">
+          <li class="task" onclick="checkTask(this,3)"><div class="cb"><svg class="chk" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="task-txt">In the Gemini side panel, type a prompt describing an image you want</span></li>
+          <li class="task" onclick="checkTask(this,3)"><div class="cb"><svg class="chk" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="task-txt">Hover over a generated image and click <strong>Insert</strong> to add it to your doc</span></li>
+          <li class="task" onclick="checkTask(this,3)"><div class="cb"><svg class="chk" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="task-txt">If you want variations, click <strong>Generate more</strong> for similar images</span></li>
+          <li class="task" onclick="checkTask(this,3)"><div class="cb"><svg class="chk" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="task-txt">If the result isn't right, click <strong>Edit prompt</strong> to adjust your description and try again</span></li>
+        </ul>
+        <div class="prompts">
+          <div class="prompts-label">Example image prompts</div>
+          <div class="prompt-chip">Create an image of a classroom with students collaborating.</div>
+          <div class="prompt-chip">Generate a simple diagram showing the writing process.</div>
+        </div>
+        <div class="done-banner" id="done-3">✓ Image generated and inserted</div>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="step" data-step="4">
+      <div class="step-hdr" onclick="toggleStep(4)">
+        <div class="step-badge" id="num-4">05</div>
+        <div class="step-icon">📂</div>
+        <div class="step-title">Reference Drive files &amp; search the web</div>
+        <div class="step-chev">▾</div>
+      </div>
+      <div class="step-body">
+        <div class="step-scene">Pull in context from your own files or the web to strengthen your content.</div>
+        <ul class="tasks" id="tasks-4">
+          <li class="task" onclick="checkTask(this,4)"><div class="cb"><svg class="chk" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="task-txt">In the bottom bar, click <strong>Sources</strong> → <strong>Add from Drive</strong> to attach a file</span></li>
+          <li class="task" onclick="checkTask(this,4)"><div class="cb"><svg class="chk" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="task-txt">Or type <code>@</code> in the prompt box and search for a file from your Drive</span></li>
+          <li class="task" onclick="checkTask(this,4)"><div class="cb"><svg class="chk" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="task-txt">Try a web-search prompt using the phrase <em>"using web search"</em> to pull in current information</span></li>
+          <li class="task" onclick="checkTask(this,4)"><div class="cb"><svg class="chk" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><span class="task-txt">Review the sources Gemini used by clicking <strong>Source</strong> in the response</span></li>
+        </ul>
+        <div class="prompts">
+          <div class="prompts-label">Try these prompts</div>
+          <div class="prompt-chip">Update the project timeline based on the latest updates from our meeting notes doc.</div>
+          <div class="prompt-chip">Write a paragraph about current research on student engagement using web search.</div>
+        </div>
+        <div class="tip">💡 Gemini can pull from Drive files, Gmail, or the web — you choose which sources to allow.</div>
+        <div class="done-banner" id="done-4">✓ Files referenced and web search used</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Quick Reference -->
+  <div class="ref-card" id="ref-card">
+    <div class="ref-card-hdr" onclick="toggleRef()">
+      <span class="ref-card-title">Quick reference — Gemini panel actions</span>
+      <span class="ref-card-chev">▾</span>
+    </div>
+    <div class="ref-body">
+      <table class="ref-table">
+        <thead><tr><th>Action</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td>Ask Gemini</td><td>Opens the Gemini side panel</td></tr>
+          <tr><td>More suggestions</td><td>Shows additional prompt ideas from Gemini</td></tr>
+          <tr><td>Insert</td><td>Adds generated text or image into your document</td></tr>
+          <tr><td>Retry</td><td>Generates a different response for the same prompt</td></tr>
+          <tr><td>Preview</td><td>View the full suggestion before inserting</td></tr>
+          <tr><td>Edit prompt</td><td>Adjust your image description and regenerate</td></tr>
+          <tr><td>Generate more</td><td>Find more similar image variations</td></tr>
+          <tr><td>Clear history</td><td>Removes all generated text/images not yet inserted</td></tr>
+          <tr><td>Retry with Google Search</td><td>Searches Google to find more info for your request</td></tr>
+          <tr><td>Gems</td><td>Chat with a custom or premade AI specialist</td></tr>
+          <tr><td>Good / Bad suggestion</td><td>Send feedback to help improve Gemini</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Self-assessment checklist -->
+  <div class="cl-card">
+    <div class="cl-label">Self-assessment checklist</div>
+    <ul class="cl-list">
+      <li class="cl-item" id="cl-0"><div class="cl-dot"></div>Gemini panel opened and explored</li>
+      <li class="cl-item" id="cl-1"><div class="cl-dot"></div>Document summarized using a prompt</li>
+      <li class="cl-item" id="cl-2"><div class="cl-dot"></div>Content refined with Refine tool</li>
+      <li class="cl-item" id="cl-3"><div class="cl-dot"></div>Image generated and inserted</li>
+      <li class="cl-item" id="cl-4"><div class="cl-dot"></div>Drive file or web search referenced</li>
+    </ul>
+  </div>
+
+  <div class="footer">Built with <a href="https://teachsmarter.com" target="_blank">Teach Smarter</a></div>
+
+</div>
+
+<script>
+  const stepTotals = [4, 4, 4, 4, 4];
+  const stepDone = [false, false, false, false, false];
+
+  function toggleStep(i) {
+    document.querySelectorAll('.step').forEach((s, idx) => {
+      if (idx === i) { s.classList.toggle('active'); }
+      else { s.classList.remove('active'); }
+    });
+  }
+
+  function toggleRef() {
+    document.getElementById('ref-card').classList.toggle('open');
+  }
+
+  function checkTask(el, si) {
+    el.classList.toggle('checked');
+    const all = document.querySelectorAll('#tasks-' + si + ' .task');
+    let count = 0;
+    all.forEach(t => { if (t.classList.contains('checked')) count++; });
+    const done = count === stepTotals[si];
+    stepDone[si] = done;
+    document.getElementById('done-' + si).classList.toggle('visible', done);
+    const num = document.getElementById('num-' + si);
+    num.textContent = done ? '✓' : (si + 1).toString().padStart(2, '0');
+    num.classList.toggle('done', done);
+    updateProgress();
+    updateChecklist();
+  }
+
+  function updateProgress() {
+    const n = stepDone.filter(Boolean).length;
+    document.getElementById('prog').style.width = Math.round(n / 5 * 100) + '%';
+    document.getElementById('prog-lbl').textContent = n + ' / 5';
+  }
+
+  function updateChecklist() {
+    for (let i = 0; i < 5; i++) {
+      document.getElementById('cl-' + i).classList.toggle('done', stepDone[i]);
+    }
+  }
+</script>
+</body>
+</html>
